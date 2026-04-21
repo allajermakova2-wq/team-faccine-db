@@ -1,0 +1,359 @@
+<style>
+.country-trains-wrap {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  padding: 20px 0 40px;
+  background: transparent;
+}
+
+.train-title {
+  color: #d8ff72;
+  font-size: 18px;
+  margin: 8px 0 14px 18px;
+  text-shadow: 0 0 8px rgba(216,255,114,0.35);
+  font-family: 'Trebuchet MS', sans-serif;
+}
+
+.rail-line {
+  position: relative;
+  width: 100%;
+  height: 26px;
+  margin: 8px 0 16px;
+}
+
+.rail-line::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 7px;
+  height: 4px;
+  background: linear-gradient(90deg, #5a4a38 0%, #8f7655 50%, #5a4a38 100%);
+  box-shadow: 0 0 6px rgba(255, 211, 130, 0.15);
+}
+
+.rail-line::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 18px;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0 18px,
+    rgba(255,255,255,0.18) 18px 23px,
+    transparent 23px 48px
+  );
+  opacity: 0.45;
+}
+
+.train-row {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+
+.train-move {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding-left: 100%;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.train-move.lang {
+  animation: trainMoveA 30s linear infinite;
+}
+
+.train-move.countries {
+  animation: trainMoveB 60s linear infinite;
+}
+
+.train-row:hover .train-move {
+  animation-play-state: paused;
+}
+
+@keyframes trainMoveA {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-130%); }
+}
+
+@keyframes trainMoveB {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-220%); }
+}
+
+.engine,
+.wagon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border-radius: 10px;
+  animation: wagonBob 2s ease-in-out infinite;
+}
+
+@keyframes wagonBob {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+.engine {
+  min-width: 190px;
+  height: 62px;
+  padding: 0 16px;
+  color: #f8e8c8;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.4px;
+  background:
+    linear-gradient(180deg, #40506a 0%, #26364d 52%, #182330 100%);
+  border: 2px solid rgba(255,255,255,0.18);
+  box-shadow:
+    0 0 18px rgba(160,190,255,0.12),
+    inset 0 2px 0 rgba(255,255,255,0.18);
+  text-shadow: 0 0 6px rgba(255,255,255,0.15);
+}
+
+.engine::before {
+  content: "";
+  position: absolute;
+  left: 16px;
+  top: -16px;
+  width: 18px;
+  height: 22px;
+  border-radius: 4px 4px 0 0;
+  background: linear-gradient(180deg, #2c3b4e 0%, #141d28 100%);
+}
+
+.engine::after {
+  content: "";
+  position: absolute;
+  right: -10px;
+  bottom: 10px;
+  width: 12px;
+  height: 4px;
+  background: #69503a;
+  border-radius: 4px;
+}
+
+.engine-light {
+  position: absolute;
+  right: 10px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ffe58a;
+  box-shadow:
+    0 0 8px rgba(255,229,138,0.85),
+    0 0 20px rgba(255,229,138,0.35);
+  animation: lampBlink 1.8s ease-in-out infinite;
+}
+
+@keyframes lampBlink {
+  0%,100% { opacity: 1; }
+  50% { opacity: 0.75; }
+}
+
+.smoke {
+  position: absolute;
+  left: 10px;
+  top: -28px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.55);
+  box-shadow:
+    14px -8px 0 2px rgba(255,255,255,0.36),
+    26px -16px 0 5px rgba(255,255,255,0.18);
+  animation: smokeRise 2.2s ease-out infinite;
+}
+
+@keyframes smokeRise {
+  0% { transform: translateY(0) scale(0.9); opacity: 0.7; }
+  100% { transform: translateY(-18px) scale(1.35); opacity: 0; }
+}
+
+.wagon {
+  min-width: 112px;
+  height: 50px;
+  padding: 0 12px;
+  color: #f6f6f6;
+  font-weight: 700;
+  font-size: 13px;
+  border: 2px solid rgba(255,255,255,0.16);
+  box-shadow:
+    0 0 10px rgba(255,255,255,0.08),
+    inset 0 2px 0 rgba(255,255,255,0.12);
+  text-shadow: 0 0 6px rgba(0,0,0,0.28);
+}
+
+.wagon::after {
+  content: "";
+  position: absolute;
+  right: -10px;
+  bottom: 8px;
+  width: 12px;
+  height: 4px;
+  background: #69503a;
+  border-radius: 4px;
+}
+
+.wagon.small {
+  min-width: 88px;
+}
+
+.wagon.red    { background: linear-gradient(180deg, #7d2f29 0%, #551d18 100%); }
+.wagon.gold   { background: linear-gradient(180deg, #b28a3e 0%, #7f5f24 100%); }
+.wagon.blue   { background: linear-gradient(180deg, #4a6ea9 0%, #2d476f 100%); }
+.wagon.green  { background: linear-gradient(180deg, #4d7b4d 0%, #2d502d 100%); }
+.wagon.plum   { background: linear-gradient(180deg, #6e4b7e 0%, #462a52 100%); }
+.wagon.teal   { background: linear-gradient(180deg, #3d7a80 0%, #22484d 100%); }
+.wagon.gray   { background: linear-gradient(180deg, #6d6f77 0%, #44464d 100%); }
+
+.wheel-set {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: -14px;
+  height: 20px;
+  pointer-events: none;
+}
+
+.wheel {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  bottom: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff 0 9%, #444 10% 40%, #121212 41% 100%);
+  animation: wheelSpin 1.2s linear infinite;
+}
+
+.wheel.left { left: 10px; }
+.wheel.right { right: 10px; }
+
+@keyframes wheelSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.train-flag {
+  margin-right: 6px;
+  font-size: 16px;
+}
+
+.train-label {
+  margin-left: 4px;
+}
+</style>
+
+<div class="country-trains-wrap">
+
+  <div class="train-title">🚂 Le indagini delle Faccine — linguaggi del viaggio</div>
+  <div class="train-row">
+    <div class="train-move lang">
+      <div class="engine">
+        <span class="smoke"></span>
+        Le indagini delle Faccine
+        <span class="engine-light"></span>
+        <div class="wheel-set">
+          <span class="wheel left"></span>
+          <span class="wheel right"></span>
+        </div>
+      </div>
+
+      <a class="wagon small red" href="#it"><span class="train-flag">🇮🇹</span>IT
+        <div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div>
+      </a>
+      <a class="wagon small blue" href="#ru"><span class="train-flag">🇷🇺</span>RU
+        <div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div>
+      </a>
+      <a class="wagon small plum" href="#lv"><span class="train-flag">🇱🇻</span>LV
+        <div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div>
+      </a>
+      <a class="wagon small gold" href="#ua"><span class="train-flag">🇺🇦</span>UA
+        <div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div>
+      </a>
+      <a class="wagon small green" href="#de"><span class="train-flag">🇩🇪</span>DE
+        <div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div>
+      </a>
+      <a class="wagon small teal" href="#en"><span class="train-flag">🇬🇧</span>EN
+        <div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div>
+      </a>
+    </div>
+  </div>
+
+  <div class="rail-line"></div>
+
+  <div class="train-title">🌍 grande viaggio delle nazioni</div>
+  <div class="train-row">
+    <div class="train-move countries">
+      <div class="engine">
+        <span class="smoke"></span>
+        Le indagini delle Faccine
+        <span class="engine-light"></span>
+        <div class="wheel-set">
+          <span class="wheel left"></span>
+          <span class="wheel right"></span>
+        </div>
+      </div>
+
+      <div class="wagon red"><span class="train-flag">🇮🇹</span>ITALY<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon blue"><span class="train-flag">🇷🇺</span>RUSSIA<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon teal"><span class="train-flag">🇺🇸</span>USA<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon green"><span class="train-flag">🇩🇪</span>GERMANY<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon plum"><span class="train-flag">🇱🇻</span>LATVIA<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon blue"><span class="train-flag">🇱🇹</span>LITHUANIA<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon teal"><span class="train-flag">🇪🇪</span>ESTONIA<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon gold"><span class="train-flag">🇦🇲</span>ARMENIA<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon green"><span class="train-flag">🇦🇿</span>AZERBAIJAN<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon blue"><span class="train-flag">🇰🇿</span>KAZAKHSTAN<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon red"><span class="train-flag">🇷🇸</span>SERBIA<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon gold"><span class="train-flag">🇦🇱</span>ALBANIA<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon red"><span class="train-flag">🇦🇫</span>AFGHANISTAN<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon teal"><span class="train-flag">🇧🇩</span>BANGLADESH<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon green"><span class="train-flag">🇧🇷</span>BRAZIL<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon red"><span class="train-flag">🇧🇴</span>BOLIVIA<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon red"><span class="train-flag">🇵🇪</span>PERU<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon gold"><span class="train-flag">🇷🇴</span>ROMANIA<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon blue"><span class="train-flag">🇲🇩</span>MOLDOVA<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon teal"><span class="train-flag">🇮🇸</span>ICELAND<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon gold"><span class="train-flag">🇵🇱</span>POLAND<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon green"><span class="train-flag">🇹🇭</span>THAILAND<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon blue"><span class="train-flag">🇨🇦</span>CANADA<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon red"><span class="train-flag">⚠️</span>CHECHNYA<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon green"><span class="train-flag">🇹🇷</span>TURKEY<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon blue"><span class="train-flag">🇹🇼</span>TAIWAN<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon gold"><span class="train-flag">🇦🇹</span>AUSTRIA<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon red"><span class="train-flag">🇩🇰</span>DENMARK<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon green"><span class="train-flag">🇮🇷</span>IRAN<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon teal"><span class="train-flag">🇮🇱</span>ISRAEL<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon red"><span class="train-flag">🇺🇦</span>UKRAINE<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon plum"><span class="train-flag">🇰🇷</span>SOUTH KOREA<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon green"><span class="train-flag">🇸🇦</span>SAUDI ARABIA<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon green"><span class="train-flag">🇿🇦</span>SOUTH AFRICA<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon teal"><span class="train-flag">🇭🇰</span>HONG KONG<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon gold"><span class="train-flag">🇭🇺</span>HUNGARY<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon red"><span class="train-flag">🇫🇷</span>FRANCE<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon teal"><span class="train-flag">🇲🇾</span>MALAYSIA<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon plum"><span class="train-flag">🇧🇬</span>BULGARIA<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon blue"><span class="train-flag">🇦🇺</span>AUSTRALIA<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon green"><span class="train-flag">🇳🇱</span>NETHERLANDS<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon gold"><span class="train-flag">🇮🇪</span>IRELAND<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon plum"><span class="train-flag">🇯🇵</span>JAPAN<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon teal"><span class="train-flag">🇸🇬</span>SINGAPORE<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon blue"><span class="train-flag">🇬🇧</span>GREAT BRITAIN<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon blue"><span class="train-flag">🇸🇪</span>SWEDEN<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon gold"><span class="train-flag">🇨🇭</span>SWITZERLAND<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+      <div class="wagon gray"><span class="train-flag">🌐</span>GLOBAL NODE<div class="wheel-set"><span class="wheel left"></span><span class="wheel right"></span></div></div>
+    </div>
+  </div>
+
+  <div class="rail-line"></div>
+</div>

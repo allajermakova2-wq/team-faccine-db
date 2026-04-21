@@ -1,107 +1,544 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Team Faccine - Database</title>
-    <style>
-        body { background: #0a0a0a; color: #e0e0e0; font-family: Arial, sans-serif; margin: 0; padding: 20px; }
-        .container { max-width: 1400px; margin: 0 auto; }
-        h1 { color: #00ffff; text-align: center; margin-bottom: 30px; }
-        .stats { background: #1a1a2e; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; gap: 20px; }
-        .stat { color: #00ffff; font-weight: bold; }
-        table { width: 100%; background: #1a1a2e; border-radius: 10px; overflow: hidden; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #0f3460; font-size: 14px; }
-        th { background: #0f3460; color: #00ffff; position: sticky; top: 0; }
-        tr:hover { background: #16213e; }
-        .loading { text-align: center; padding: 40px; color: #00ffff; }
-        .error { color: #e94560; text-align: center; padding: 20px; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ritual Scene</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: transparent;
+    }
+
+    #ritual-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      min-height: 420px;
+      overflow: hidden;
+      background: #000;
+      cursor: default;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      filter: contrast(1.12) brightness(0.92);
+    }
+
+    #debug {
+      position: absolute;
+      left: 12px;
+      bottom: 12px;
+      z-index: 10;
+      color: #87ffd4;
+      font: 12px/1.4 monospace;
+      background: rgba(0, 0, 0, 0.45);
+      padding: 8px 10px;
+      border: 1px solid rgba(135, 255, 212, 0.22);
+      border-radius: 6px;
+      white-space: pre-line;
+      pointer-events: none;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🕵️‍♀️ Team Faccine Database</h1>
-        <div class="stats">
-            <span class="stat">Всего: <span id="total">0</span></span>
-            <span class="stat">Показано: <span id="visible">0</span></span>
-        </div>
-        <div id="tableContainer" class="loading">Загрузка данных...</div>
-    </div>
+  <div id="ritual-wrapper">
+    <canvas id="scene"></canvas>
+    <div id="debug">Загрузка...</div>
+  </div>
 
-    <script>
-        async function loadData() {
-            try {
-                const response = await fetch('database.csv');
-                const text = await response.text();
-                
-                // Простой парсер CSV с обработкой кавычек
-                function parseCSV(csv) {
-                    const rows = [];
-                    let currentRow = [], currentCell = '', inQuotes = false;
-                    
-                    for (let i = 0; i < csv.length; i++) {
-                        const char = csv[i];
-                        const nextChar = csv[i + 1];
-                        
-                        if (char === '"') {
-                            if (inQuotes && nextChar === '"') { currentCell += '"'; i++; }
-                            else { inQuotes = !inQuotes; }
-                        }
-                        else if (char === ',' && !inQuotes) {
-                            currentRow.push(currentCell.trim());
-                            currentCell = '';
-                        }
-                        else if ((char === '\n' || char === '\r') && !inQuotes) {
-                            if (currentCell || currentRow.length) {
-                                currentRow.push(currentCell.trim());
-                                if (currentRow.some(c => c)) rows.push(currentRow);
-                                currentRow = []; currentCell = '';
-                            }
-                            if (char === '\r' && nextChar === '\n') i++;
-                        }
-                        else { currentCell += char; }
-                    }
-                    if (currentCell || currentRow.length) {
-                        currentRow.push(currentCell.trim());
-                        if (currentRow.some(c => c)) rows.push(currentRow);
-                    }
-                    return rows;
-                }
-                
-                const data = parseCSV(text);
-                if (data.length < 2) throw new Error('Нет данных');
-                
-                const headers = data[0];
-                const rows = data.slice(1);
-                
-                document.getElementById('total').textContent = rows.length;
-                document.getElementById('visible').textContent = rows.length;
-                
-                let html = '<table><thead><tr>';
-                headers.forEach(h => html += `<th>${h}</th>`);
-                html += '</tr></thead><tbody>';
-                
-                rows.forEach(row => {
-                    html += '<tr>';
-                    for (let i = 0; i < headers.length; i++) {
-                        const cell = row[i] || '';
-                        // Обрезаем длинные тексты
-                        const display = cell.length > 100 ? cell.substring(0, 100) + '...' : cell;
-                        html += `<td>${display}</td>`;
-                    }
-                    html += '</tr>';
-                });
-                
-                html += '</tbody></table>';
-                document.getElementById('tableContainer').innerHTML = html;
-                
-            } catch (e) {
-                console.error(e);
-                document.getElementById('tableContainer').innerHTML = 
-                    '<p class="error">⚠️ Ошибка: ' + e.message + '<br><small>Проверьте консоль (F12) для деталей</small></p>';
-            }
+  <audio id="ritual-audio" preload="auto" loop>
+    <source src="./Beneath_the_Sunken_Spire.mp3" type="audio/mpeg" />
+  </audio>
+
+  <script>
+    const wrapper = document.getElementById("ritual-wrapper");
+    const canvas = document.getElementById("scene");
+    const ctx = canvas.getContext("2d");
+    const debugBox = document.getElementById("debug");
+    const ritualAudio = document.getElementById("ritual-audio");
+
+    let stars = [];
+    let rays = [];
+    let sparks = [];
+    let dpr = Math.max(1, window.devicePixelRatio || 1);
+    let sceneW = 0;
+    let sceneH = 0;
+
+    let chaliceBounds = null;
+    let leftMonkBounds = null;
+    let rightMonkBounds = null;
+
+    let audioStarted = false;
+    let ritualPower = 0;
+    let ritualTarget = 0;
+    let flashPower = 0;
+
+    const imgs = {
+      left: new Image(),
+      right: new Image(),
+      chalice: new Image()
+    };
+
+    const loadState = {
+      left: false,
+      right: false,
+      chalice: false
+    };
+
+    imgs.left.src = "./2.png";
+    imgs.right.src = "./3.png";
+    imgs.chalice.src = "./6.png";
+
+    function updateDebug() {
+      debugBox.textContent =
+        "left: " + (loadState.left ? "ok" : "loading/error") + "\n" +
+        "right: " + (loadState.right ? "ok" : "loading/error") + "\n" +
+        "chalice: " + (loadState.chalice ? "ok" : "loading/error") + "\n" +
+        "ritual: " + (ritualTarget ? "active" : "idle");
+    }
+
+    Object.entries(imgs).forEach(([key, img]) => {
+      img.onload = () => {
+        loadState[key] = true;
+        updateDebug();
+      };
+
+      img.onerror = () => {
+        loadState[key] = false;
+        updateDebug();
+        console.error("Ошибка загрузки:", key);
+      };
+    });
+
+    function resize() {
+      const rect = wrapper.getBoundingClientRect();
+      sceneW = Math.max(1, rect.width);
+      sceneH = Math.max(1, rect.height);
+      dpr = Math.max(1, window.devicePixelRatio || 1);
+
+      canvas.width = Math.round(sceneW * dpr);
+      canvas.height = Math.round(sceneH * dpr);
+
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(dpr, dpr);
+
+      makeStars();
+    }
+
+    function makeStars() {
+      stars = [];
+      for (let i = 0; i < 80; i++) {
+        stars.push({
+          x: Math.random() * sceneW,
+          y: Math.random() * sceneH,
+          r: Math.random() * 1.2,
+          a: Math.random(),
+          s: Math.random() * 0.02
+        });
+      }
+    }
+
+    function drawStars(time) {
+      stars.forEach(s => {
+        const alpha = Math.abs(Math.sin(time * s.s)) * s.a;
+        ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+
+    function spawnRays(midX, midY, scale) {
+      const count = ritualPower > 0.01 ? 4 : 2;
+
+      for (let i = 0; i < count; i++) {
+        const toLeft = Math.random() > 0.5;
+        const targetX = toLeft
+          ? midX - (240 + Math.random() * 140) * scale
+          : midX + (240 + Math.random() * 140) * scale;
+
+        const targetY = midY + (Math.random() * 150 - 75) * scale;
+
+        rays.push({
+          x: midX + (Math.random() * 8 - 4) * scale,
+          y: midY - 16 * scale + (Math.random() * 10 - 5) * scale,
+          px: midX,
+          py: midY,
+          tx: targetX,
+          ty: targetY,
+          vx: (targetX - midX) * (0.018 + Math.random() * 0.01) * (1 + ritualPower * 1.8),
+          vy: (targetY - midY) * (0.018 + Math.random() * 0.01) * (1 + ritualPower * 1.8),
+          life: 0,
+          maxLife: 24 + Math.random() * 14,
+          width: (0.8 + Math.random() * 1.2) * (1 + ritualPower * 0.25)
+        });
+      }
+    }
+
+    function spawnSparks(midX, midY, scale) {
+      const count = ritualPower > 0.1 ? 3 : 1;
+
+      for (let i = 0; i < count; i++) {
+        sparks.push({
+          x: midX + (Math.random() * 40 - 20) * scale,
+          y: midY - 40 * scale + (Math.random() * 12 - 6) * scale,
+          vx: (Math.random() * 2 - 1) * 0.35 * scale,
+          vy: -(0.6 + Math.random() * 1.3) * scale,
+          life: 0,
+          maxLife: 26 + Math.random() * 20,
+          size: (0.8 + Math.random() * 1.4) * (1 + ritualPower * 0.25)
+        });
+      }
+    }
+
+    function drawRays() {
+      ctx.save();
+      ctx.lineCap = "round";
+
+      for (let i = rays.length - 1; i >= 0; i--) {
+        const r = rays[i];
+        r.life++;
+        r.px = r.x;
+        r.py = r.y;
+        r.x += r.vx;
+        r.y += r.vy;
+
+        const alpha = Math.max(0, 1 - r.life / r.maxLife);
+
+        ctx.strokeStyle = `rgba(100, 210, 255, ${alpha * (0.55 + ritualPower * 0.35)})`;
+        ctx.lineWidth = r.width * 4;
+        ctx.beginPath();
+        ctx.moveTo(r.px, r.py);
+        ctx.lineTo(r.x, r.y);
+        ctx.stroke();
+
+        ctx.strokeStyle = `rgba(210, 245, 255, ${alpha * 0.95})`;
+        ctx.lineWidth = r.width;
+        ctx.beginPath();
+        ctx.moveTo(r.px, r.py);
+        ctx.lineTo(r.x, r.y);
+        ctx.stroke();
+
+        if (ritualPower > 0.15) {
+          ctx.fillStyle = `rgba(255,255,255,${alpha * 0.8})`;
+          ctx.beginPath();
+          ctx.arc(r.x, r.y, r.width * 1.2, 0, Math.PI * 2);
+          ctx.fill();
         }
-        loadData();
-    </script>
+
+        if (r.life >= r.maxLife) {
+          rays.splice(i, 1);
+        }
+      }
+
+      ctx.restore();
+    }
+
+    function drawSparks() {
+      for (let i = sparks.length - 1; i >= 0; i--) {
+        const s = sparks[i];
+        s.life++;
+        s.x += s.vx;
+        s.y += s.vy;
+        s.vx *= 0.99;
+        s.vy *= 1.01;
+
+        const alpha = Math.max(0, 1 - s.life / s.maxLife);
+
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.size * 2.5, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0, 160, 255, ${alpha * 0.08})`;
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(220, 245, 255, ${alpha * 0.9})`;
+        ctx.fill();
+
+        if (s.life >= s.maxLife) {
+          sparks.splice(i, 1);
+        }
+      }
+    }
+
+    function drawFallbackShapes(midX, midY, scale, breathe) {
+      ctx.save();
+
+      ctx.globalAlpha = 0.18;
+      ctx.fillStyle = "#3c95ff";
+      ctx.fillRect(midX - 450 * scale, midY - 250 * scale + breathe, 350 * scale, 500 * scale);
+
+      ctx.fillStyle = "#5036c9";
+      ctx.fillRect(midX + 100 * scale, midY - 230 * scale - breathe, 300 * scale, 450 * scale);
+
+      ctx.globalAlpha = 0.42;
+      ctx.fillStyle = "#d7c08a";
+      ctx.beginPath();
+      ctx.ellipse(midX, midY + 20 * scale, 58 * scale, 92 * scale, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function drawAura(midX, midY, scale, time) {
+      const pulse = 0.8 + Math.sin(time * 0.005) * (0.1 + ritualPower * 0.24);
+      const radius = 140 * scale * (pulse + ritualPower * 0.65);
+
+      const g = ctx.createRadialGradient(
+        midX,
+        midY - 30 * scale,
+        0,
+        midX,
+        midY - 30 * scale,
+        radius
+      );
+
+      g.addColorStop(0, `rgba(0,180,255,${(0.35 + ritualPower * 0.42) * pulse})`);
+      g.addColorStop(0.35, `rgba(0,120,255,${0.12 + ritualPower * 0.18})`);
+      g.addColorStop(1, "rgba(0,0,0,0)");
+
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, sceneW, sceneH);
+    }
+
+    function drawGroundGlow(midX, midY, scale, time) {
+      const pulse = 0.82 + Math.sin(time * 0.0043) * (0.14 + ritualPower * 0.12);
+
+      const g = ctx.createRadialGradient(
+        midX,
+        midY + 110 * scale,
+        0,
+        midX,
+        midY + 110 * scale,
+        120 * scale * (pulse + ritualPower * 0.35)
+      );
+
+      g.addColorStop(0, `rgba(0, 100, 255, ${(0.18 + ritualPower * 0.14) * pulse})`);
+      g.addColorStop(1, "rgba(0,0,0,0)");
+
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, sceneW, sceneH);
+    }
+
+    function drawBeamHaze(midX, midY, scale, time) {
+      const flicker = 0.75 + Math.sin(time * 0.01) * 0.08;
+      const strength = 0.08 + ritualPower * 0.16;
+
+      const leftGlow = ctx.createLinearGradient(
+        midX,
+        midY - 20 * scale,
+        midX - 340 * scale,
+        midY
+      );
+      leftGlow.addColorStop(0, `rgba(0, 170, 255, ${strength * flicker})`);
+      leftGlow.addColorStop(1, "rgba(0,0,0,0)");
+
+      ctx.fillStyle = leftGlow;
+      ctx.beginPath();
+      ctx.moveTo(midX, midY - 18 * scale);
+      ctx.lineTo(midX - 320 * scale, midY - 92 * scale);
+      ctx.lineTo(midX - 320 * scale, midY + 92 * scale);
+      ctx.closePath();
+      ctx.fill();
+
+      const rightGlow = ctx.createLinearGradient(
+        midX,
+        midY - 20 * scale,
+        midX + 340 * scale,
+        midY
+      );
+      rightGlow.addColorStop(0, `rgba(0, 170, 255, ${strength * flicker})`);
+      rightGlow.addColorStop(1, "rgba(0,0,0,0)");
+
+      ctx.fillStyle = rightGlow;
+      ctx.beginPath();
+      ctx.moveTo(midX, midY - 18 * scale);
+      ctx.lineTo(midX + 320 * scale, midY - 92 * scale);
+      ctx.lineTo(midX + 320 * scale, midY + 92 * scale);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function drawHaloRing(midX, midY, scale, time) {
+      if (ritualPower < 0.05) return;
+
+      const ringPulse = 1 + Math.sin(time * 0.008) * 0.08;
+      const r = 70 * scale * ringPulse * (1 + ritualPower * 0.45);
+
+      ctx.save();
+      ctx.strokeStyle = `rgba(120,220,255,${0.10 + ritualPower * 0.18})`;
+      ctx.lineWidth = 2 + ritualPower * 2;
+      ctx.beginPath();
+      ctx.ellipse(midX, midY + 30 * scale, r, r * 0.45, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawActivationFlash() {
+      if (flashPower <= 0.001) return;
+      ctx.fillStyle = `rgba(180,230,255,${flashPower * 0.22})`;
+      ctx.fillRect(0, 0, sceneW, sceneH);
+    }
+
+    function activateRitual() {
+      ritualTarget = 1;
+      flashPower = 1;
+      updateDebug();
+
+      if (!audioStarted) {
+        ritualAudio.volume = 0.72;
+        ritualAudio.play()
+          .then(() => {
+            audioStarted = true;
+          })
+          .catch(err => {
+            console.error("Не удалось запустить звук:", err);
+          });
+      } else if (ritualAudio.paused) {
+        ritualAudio.play().catch(err => {
+          console.error("Не удалось запустить звук:", err);
+        });
+      }
+    }
+
+    function deactivateRitual() {
+      ritualTarget = 0;
+      updateDebug();
+
+      ritualAudio.pause();
+      ritualAudio.currentTime = 0;
+      audioStarted = false;
+    }
+
+    function pointInRect(x, y, rect) {
+      if (!rect) return false;
+      return (
+        x >= rect.x &&
+        x <= rect.x + rect.w &&
+        y >= rect.y &&
+        y <= rect.y + rect.h
+      );
+    }
+
+    canvas.addEventListener("click", (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      if (pointInRect(x, y, chaliceBounds)) {
+        activateRitual();
+        return;
+      }
+
+      if (pointInRect(x, y, leftMonkBounds) || pointInRect(x, y, rightMonkBounds)) {
+        deactivateRitual();
+      }
+    });
+
+    function draw(time) {
+      ctx.clearRect(0, 0, sceneW, sceneH);
+      ctx.fillStyle = "#000";
+      ctx.fillRect(0, 0, sceneW, sceneH);
+
+      ritualPower += (ritualTarget - ritualPower) * 0.03;
+      flashPower *= 0.92;
+
+      drawStars(time);
+
+      const scale = Math.min(sceneW / 1000, sceneH / 600);
+      const midX = sceneW / 2;
+      const midY = sceneH / 2;
+      const breathe = Math.sin(time * 0.002) * (5 + ritualPower * 2);
+
+      spawnRays(midX, midY, scale);
+      spawnSparks(midX, midY, scale);
+
+      drawGroundGlow(midX, midY, scale, time);
+      drawBeamHaze(midX, midY, scale, time);
+      drawRays();
+      drawSparks();
+
+      const leftReady = loadState.left;
+      const rightReady = loadState.right;
+      const chaliceReady = loadState.chalice;
+
+      const leftX = midX - 450 * scale;
+      const leftY = midY - 250 * scale + breathe;
+      const leftW = 350 * scale;
+      const leftH = 500 * scale;
+
+      const rightX = midX + 100 * scale;
+      const rightY = midY - 230 * scale - breathe;
+      const rightW = 300 * scale;
+      const rightH = 450 * scale;
+
+      leftMonkBounds = { x: leftX, y: leftY, w: leftW, h: leftH };
+      rightMonkBounds = { x: rightX, y: rightY, w: rightW, h: rightH };
+
+      if (leftReady) {
+        ctx.globalAlpha = 0.9 + ritualPower * 0.08;
+        ctx.drawImage(imgs.left, leftX, leftY, leftW, leftH);
+        ctx.globalAlpha = 1;
+      }
+
+      if (rightReady) {
+        ctx.globalAlpha = 0.9 + ritualPower * 0.08;
+        ctx.drawImage(imgs.right, rightX, rightY, rightW, rightH);
+        ctx.globalAlpha = 1;
+      }
+
+      const cW = 180 * scale;
+      const cH = 260 * scale;
+      const cX = midX - cW / 2;
+      const cY = midY - cH / 2;
+
+      chaliceBounds = {
+        x: cX,
+        y: cY,
+        w: cW,
+        h: cH
+      };
+
+      if (chaliceReady) {
+        if (ritualPower > 0.03) {
+          ctx.save();
+          ctx.globalAlpha = 0.08 + ritualPower * 0.18;
+          ctx.drawImage(
+            imgs.chalice,
+            cX - 5 * ritualPower,
+            cY - 8 * ritualPower,
+            cW + 10 * ritualPower,
+            cH + 12 * ritualPower
+          );
+          ctx.restore();
+        }
+
+        ctx.drawImage(imgs.chalice, cX, cY, cW, cH);
+      }
+
+      if (!leftReady || !rightReady || !chaliceReady) {
+        drawFallbackShapes(midX, midY, scale, breathe);
+      }
+
+      drawAura(midX, midY, scale, time);
+      drawHaloRing(midX, midY, scale, time);
+      drawActivationFlash();
+
+      requestAnimationFrame(draw);
+    }
+
+    window.addEventListener("resize", resize);
+
+    resize();
+    updateDebug();
+    requestAnimationFrame(draw);
+  </script>
 </body>
 </html>

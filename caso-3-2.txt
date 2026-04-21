@@ -1,0 +1,132 @@
+<style>
+  .legal-notice {
+    background-color: #000000;
+    color: #00ff00;
+    font-family: 'Courier New', Courier, monospace;
+    padding: 20px;
+    border: 1px solid #333;
+    line-height: 1.4;
+    text-align: left;
+    max-width: 900px;
+    margin: auto;
+    position: relative;
+  }
+
+  .glow-red { color: #ff0000; text-shadow: 0 0 5px #ff0000; font-weight: bold; }
+  .header-box { border-bottom: 1px double #00ff00; margin-bottom: 15px; padding-bottom: 10px; }
+  .section-title { color: #ffd700; font-weight: bold; text-decoration: underline; display: block; margin: 10px 0; }
+
+  .stamp-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    border: 2px double #ffd700;
+    color: #ffd700;
+    padding: 5px 10px;
+    font-size: 11px;
+    font-weight: bold;
+    transform: rotate(10deg);
+    text-align: center;
+    background: rgba(255, 215, 0, 0.05);
+    box-shadow: 0 0 8px rgba(255, 215, 0, 0.2);
+    pointer-events: none;
+  }
+
+  .timer-wrap {
+    margin-top: 20px;
+    padding: 12px;
+    border: 1px dashed #ff0000;
+    background: rgba(255, 0, 0, 0.05);
+    text-align: center;
+  }
+  .timer-digits { font-size: 26px; color: #ff0000; text-shadow: 0 0 10px #ff0000; font-weight: bold; display: block; }
+  .timer-label { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 2px; }
+
+  .control-panel {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+    border-top: 1px solid #333;
+    padding-top: 15px;
+  }
+
+  .btn-sys {
+    background: transparent;
+    border: 1px solid #00ff00;
+    color: #00ff00;
+    padding: 8px 16px;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.3s;
+    text-decoration: none;
+    font-size: 12px;
+  }
+
+  .btn-sys:hover { background: #00ff00; color: #000; box-shadow: 0 0 12px #00ff00; }
+  .btn-pdf { border-color: #ffd700; color: #ffd700; }
+  .btn-pdf:hover { background: #ffd700; color: #000; box-shadow: 0 0 12px #ffd700; }
+
+  @media print { .control-panel { display: none; } }
+</style>
+
+<div class="legal-notice">
+  <div class="stamp-container">
+    VALIDATED<br>CASO №3<br>SWITZERLAND NODES ACTIVE
+  </div>
+
+  <div class="header-box">
+    <strong>Уважаемые Enel Energia S.p.A.,</strong><br>
+    Нижеподписавшаяся <span class="glow-red">АЛЛА ЕРМАКОВА (ALLA JERMAKOVA)</span>, родившаяся <span class="glow-red">10.09.1969</span>, Codice Fiscale JRMLLA69P50Z145Q, проживающая по адресу: Via San Giacomo 4, 20091 Bresso (MI).
+  </div>
+
+  <span class="section-title">ПРИНИМАЯ ВО ВНИМАНИЕ (PREMESSO CHE)</span>
+  • Полученное уведомление от 26.02.2026;<br>
+  • Нижеподписавшаяся является <span class="glow-red">УЯЗВИМЫМ КЛИЕНТОМ (CLIENTE VULNERABILE)</span> с инвалидностью <span class="glow-red">80%</span>;<br>
+  • Для категории уязвимых лиц <span class="glow-red">НЕ СУЩЕСТВУЕТ СРОКА ОКОНЧАНИЯ</span> для доступа к защищенному тарифу (Tutela).
+
+  <span class="section-title">ОСПАРИВАЕТ (CONTESTA)</span>
+  Формально оспариваю содержание уведомления. Срок 30.06.2025 не ограничивает постоянные права уязвимых категорий граждан.
+
+  <span class="section-title">ТРЕБУЕТ (CHIEDE)</span>
+  1. Аннулирование отказа;<br>
+  2. Немедленную активацию защищенного сервиса (Servizio di Tutela);<br>
+  3. Применение цен, установленных регулятором ARERA.
+
+  <div class="timer-wrap">
+    <span class="timer-label">Ultimatum: 06.04.2026</span>
+    <span class="timer-digits" id="countdown-legal-updated">00.00.00.00</span>
+    <span style="color: #ff0000; font-size: 9px;">ВРЕМЯ НА ОФИЦИАЛЬНЫЙ ОТВЕТ</span>
+  </div>
+
+  <div class="control-panel">
+    <a href="#" class="btn-sys btn-pdf" onclick="alert('Генерация юридического PDF-отчета...'); return false;">[ СКАЧАТЬ PDF ]</a>
+    <button class="btn-sys" onclick="window.print()">[ РАСПЕЧАТАТЬ ДЛЯ СУДА ]</button>
+  </div>
+</div>
+
+<script>
+  // Устанавливаем дедлайн: 6 апреля 2026
+  const deadlineDate = new Date(2026, 3, 6, 23, 59, 59).getTime();
+
+  function updateLegalCountdown() {
+    const now = new Date().getTime();
+    const gap = deadlineDate - now;
+    if (gap <= 0) {
+      document.getElementById("countdown-legal-updated").innerHTML = "СРОК ИСТЕК / SCADUTO";
+      return;
+    }
+    const d = Math.floor(gap / (1000 * 60 * 60 * 24));
+    const h = Math.floor((gap % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const m = Math.floor((gap % (1000 * 60 * 60)) / (1000 * 60));
+    const s = Math.floor((gap % (1000 * 60)) / 1000);
+
+    const f = (n) => String(n).padStart(2, '0');
+    document.getElementById("countdown-legal-updated").innerHTML = f(d) + ":" + f(h) + ":" + f(m) + ":" + f(s);
+  }
+
+  setInterval(updateLegalCountdown, 1000);
+  updateLegalCountdown();
+</script>

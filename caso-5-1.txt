@@ -1,0 +1,90 @@
+<style>
+.story-marquee-wrap {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background: transparent;
+  padding: 10px 0;
+}
+
+.story-marquee {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  border-top: 1px solid rgba(255,215,100,0.3);
+  border-bottom: 1px solid rgba(255,215,100,0.3);
+  background: linear-gradient(180deg, rgba(10,18,45,0.4) 0%, rgba(15,25,60,0.6) 45%, rgba(8,12,28,0.4) 100%);
+  box-shadow: 0 0 25px rgba(60,120,255,0.15);
+}
+
+.story-marquee-track {
+  display: inline-flex;
+  align-items: center;
+  gap: 60px;
+  animation: storyMarqueeRun 60s linear infinite; /* Немного замедлил для читаемости */
+}
+
+@keyframes storyMarqueeRun {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.story-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 15px;
+  font-family: "Georgia", serif;
+  font-size: 28px; /* Чуть уменьшил, чтобы больше языков помещалось в кадр */
+  font-weight: 700;
+  white-space: nowrap;
+  background: linear-gradient(to bottom, #fff5d7 0%, #ffdb7d 25%, #e2b041 50%, #ffdb7d 75%, #fff5d7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 2px rgba(0,0,0,0.6));
+}
+
+.story-lang {
+  font-size: 13px;
+  font-family: "Arial", sans-serif;
+  font-weight: 900;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(60,120,255,0.3);
+  border: 1px solid rgba(255,255,255,0.4);
+  -webkit-text-fill-color: #fff;
+  color: #fff;
+}
+
+.story-sep {
+  -webkit-text-fill-color: #ffdb7d;
+  font-size: 22px;
+  opacity: 0.8;
+}
+</style>
+
+<div class="story-marquee-wrap">
+  <div class="story-marquee">
+    <div class="story-marquee-track">
+      <span class="story-item"><span class="story-lang">IT</span> La Storia della Barbina… <span class="story-sep">✦</span></span>
+      <span class="story-item"><span class="story-lang">RU</span> Повесть о Жиденькой Бороде… <span class="story-sep">✦</span></span>
+      <span class="story-item"><span class="story-lang">UA</span> Повість про Ріденьку Бороду… <span class="story-sep">✦</span></span>
+      <span class="story-item"><span class="story-lang">EN</span> The Tale of the Scanty Beard… <span class="story-sep">✦</span></span>
+      <span class="story-item"><span class="story-lang">FR</span> Le Conte de la Barbe Chétive… <span class="story-sep">✦</span></span>
+      <span class="story-item"><span class="story-lang">LV</span> Stāsts par Šķidro Bārdiņu… <span class="story-sep">✦</span></span>
+      <span class="story-item"><span class="story-lang">CE/95</span> КIезигчу мажах лаьцна повесть… <span class="story-sep">✦</span></span>
+      <span class="story-item"><span class="story-lang">AF</span> د نري ږیرې کیسه… <span class="story-sep">✦</span></span>
+      <span class="story-item"><span class="story-lang">PS</span> قصة اللحية الخفيفة… <span class="story-sep">✦</span></span>
+
+      <span class="story-item"><span class="story-lang">IT</span> La Storia della Barbina… <span class="story-sep">✦</span></span>
+      <span class="story-item"><span class="story-lang">RU</span> Повесть о Жиденькой Бороде… <span class="story-sep">✦</span></span>
+      <span class="story-item"><span class="story-lang">UA</span> Повість про Ріденьку Бороду… <span class="story-sep">✦</span></span>
+      <span class="story-item"><span class="story-lang">EN</span> The Tale of the Scanty Beard… <span class="story-sep">✦</span></span>
+      <span class="story-item"><span class="story-lang">FR</span> Le Conte de la Barbe Chétive… <span class="story-sep">✦</span></span>
+      <span class="story-item"><span class="story-lang">LV</span> Stāsts par Šķidro Bārdiņu… <span class="story-sep">✦</span></span>
+      <span class="story-item"><span class="story-lang">CE/95</span> КIезигчу мажах лаьцна повесть… <span class="story-sep">✦</span></span>
+      <span class="story-item"><span class="story-lang">AF</span> د نري ږیرې کیسه… <span class="story-sep">✦</span></span>
+      <span class="story-item"><span class="story-lang">PS</span> قصة اللحية الخفيفة… <span class="story-sep">✦</span></span>
+    </div>
+  </div>
+</div>
