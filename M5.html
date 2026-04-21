@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Global AI Matrix Network</title>
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+  font-family: "Courier New", monospace;
+}
+
+#matrixCanvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  background: #000;
+}
+
+.screen-flicker {
+  position: fixed;
+  inset: 0;
+  background: rgba(255,255,255,0.02);
+  opacity: 0.03;
+  z-index: 1;
+  pointer-events: none;
+  animation: flicker 0.18s infinite;
+}
+
+@keyframes flicker {
+  0% { opacity: 0.03; }
+  25% { opacity: 0.01; }
+  50% { opacity: 0.04; }
+  75% { opacity: 0.02; }
+  100% { opacity: 0.03; }
+}
+
+.alert-wave {
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255,0,0,0) 0%,
+      rgba(255,30,30,0.08) 25%,
+      rgba(255,70,70,0.22) 50%,
+      rgba(255,30,30,0.08) 75%,
+      rgba(255,0,0,0) 100%
+    );
+  transform: translateX(-100%);
+}
+
+.alert-wave.active {
+  animation: breachWave 1s ease-out 1;
+}
+
+@keyframes breachWave {
+  0% { opacity: 0; transform: translateX(-100%); }
+  15% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(100%); }
+}
+
+.alert-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(circle at center,
+      rgba(255,255,255,0.18) 0%,
+      rgba(120,190,255,0.10) 30%,
+      rgba(255,0,0,0.03) 58%,
+      rgba(0,0,0,0) 100%);
+}
+
+.alert-flash.active {
+  animation: alertFlash 0.5s ease-out 1;
+}
+
+@keyframes alertFlash {
+  0% { opacity: 0; }
+  18% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.marquee-container {
+  position: relative;
+  z-index: 3;
+  margin-top: 34px;
+  background: rgba(0, 15, 0, 0.78);
+  color: #00ff66;
+  padding: 14px 0;
+  border-top: 1px solid #0f0;
+  border-bottom: 1px solid #0f0;
+  overflow: hidden;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 0 20px rgba(0,255,0,0.12);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.marquee-container.breach-mode {
+  border-top-color: #ff3b3b;
+  border-bottom-color: #ff3b3b;
+  box-shadow: 0 0 30px rgba(255, 40, 40, 0.30);
+  background: rgba(25, 5, 5, 0.82);
+}
+
+.marquee-content {
+  display: flex;
+  animation: marquee-run 130s linear infinite;
+}
+
+.country {
+  display: inline-block;
+  padding-right: 90px;
+  font-weight: bold;
+  font-size: 18px;
+  color: #00ff66;
+  text-shadow: 0 0 6px #00ff66, 0 0 16px rgba(0,255,102,0.35);
+  letter-spacing: 1px;
+  transition: color 0.12s ease, text-shadow 0.12s ease, transform 0.12s ease, filter 0.12s ease;
+}
+
+.country[data-final*="OPENAI"],
+.country[data-final*="CHATGPT"],
+.country[data-final*="GPT-4"],
+.country[data-final*="GPT-5"] {
+  color: #66ccff;
+  text-shadow: 0 0 6px #66ccff, 0 0 16px rgba(102,204,255,0.40);
+}
+
+.country[data-final*="CLAUDE"],
+.country[data-final*="ANTHROPIC"],
+.country[data-final*="MISTRAL"] {
+  color: #ffd24d;
+  text-shadow: 0 0 6px #ffd24d, 0 0 16px rgba(255,210,77,0.40);
+}
+
+.country[data-final*="GEMINI"],
+.country[data-final*="GOOGLE AI"],
+.country[data-final*="COPILOT"],
+.country[data-final*="MICROSOFT AI"] {
+  color: #7cffc4;
+  text-shadow: 0 0 6px #7cffc4, 0 0 16px rgba(124,255,196,0.42);
+}
+
+.country[data-final*="LLAMA"],
+.country[data-final*="META AI"],
+.country[data-final*="PERPLEXITY"] {
+  color: #ff7f7f;
+  text-shadow: 0 0 6px #ff7f7f, 0 0 16px rgba(255,127,127,0.42);
+}
+
+.country[data-final*="STABILITY AI"],
+.country[data-final*="MIDJOURNEY"],
+.country[data-final*="GLOBAL AI NODE"] {
+  color: #e3b6ff;
+  text-shadow: 0 0 6px #e3b6ff, 0 0 16px rgba(227,182,255,0.42);
+}
+
+.country.glitch {
+  animation: redGlitch 0.18s linear 1;
+}
+
+.country.global-breach {
+  color: #ff3b3b !important;
+  text-shadow: 0 0 8px #ff3b3b, 0 0 20px rgba(255,59,59,0.65) !important;
+  transform: translateY(-1px);
+}
+
+.country.chain-react {
+  filter: brightness(1.4);
+  transform: translateY(-1px);
+  text-shadow: 0 0 8px #ffffff, 0 0 20px rgba(255,255,255,0.55);
+}
+
+@keyframes redGlitch {
+  0% { transform: translateX(0); }
+  20% { color: #ff2a2a; transform: translateX(-2px); }
+  40% { color: #ffffff; transform: translateX(2px); }
+  60% { color: #ff2a2a; transform: translateX(-1px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes marquee-run {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+</style>
+</head>
+<body>
+
+<canvas id="matrixCanvas"></canvas>
+<div class="screen-flicker"></div>
+<div class="alert-wave" id="alertWave"></div>
+<div class="alert-flash" id="alertFlash"></div>
+
+<div class="marquee-container" id="marqueeContainer">
+  <div class="marquee-content" id="marquee">
+    <span class="country" data-final="🤖 OPENAI — NEURAL CORE ACTIVE"></span>
+    <span class="country" data-final="💬 CHATGPT — CONVERSATION STREAM ONLINE"></span>
+    <span class="country" data-final="🧠 GPT-4 — REASONING CHANNEL STABLE"></span>
+    <span class="country" data-final="⚡ GPT-5 — COGNITIVE MATRIX READY"></span>
+    <span class="country" data-final="🟠 CLAUDE — CONTEXT ENGINE ACTIVE"></span>
+    <span class="country" data-final="🧬 ANTHROPIC — SAFETY LAYER STABLE"></span>
+    <span class="country" data-final="💎 GEMINI — MULTIMODAL NODE ONLINE"></span>
+    <span class="country" data-final="🌈 GOOGLE AI — SIGNAL SYNCHRONIZED"></span>
+    <span class="country" data-final="🪟 COPILOT — SYSTEM ASSIST MODE ENABLED"></span>
+    <span class="country" data-final="🔷 MICROSOFT AI — CLOUD CIRCUITS ACTIVE"></span>
+    <span class="country" data-final="🌪 MISTRAL — INFERENCE CURRENT FLOWING"></span>
+    <span class="country" data-final="🦙 LLAMA — OPEN WEIGHTS LINKED"></span>
+    <span class="country" data-final="♾ META AI — NETWORK BRIDGE ACTIVE"></span>
+    <span class="country" data-final="🔍 PERPLEXITY — SEARCH NODE STABLE"></span>
+    <span class="country" data-final="🖼 STABILITY AI — IMAGE CORE ONLINE"></span>
+    <span class="country" data-final="🎨 MIDJOURNEY — CREATIVE CHANNEL ACTIVE"></span>
+    <span class="country" data-final="🌐 GLOBAL AI NODE — DATA SECURED"></span>
+
+    <span class="country" data-final="🤖 OPENAI — NEURAL CORE ACTIVE"></span>
+    <span class="country" data-final="💬 CHATGPT — CONVERSATION STREAM ONLINE"></span>
+    <span class="country" data-final="🧠 GPT-4 — REASONING CHANNEL STABLE"></span>
+    <span class="country" data-final="⚡ GPT-5 — COGNITIVE MATRIX READY"></span>
+    <span class="country" data-final="🟠 CLAUDE — CONTEXT ENGINE ACTIVE"></span>
+    <span class="country" data-final="🧬 ANTHROPIC — SAFETY LAYER STABLE"></span>
+    <span class="country" data-final="💎 GEMINI — MULTIMODAL NODE ONLINE"></span>
+    <span class="country" data-final="🌈 GOOGLE AI — SIGNAL SYNCHRONIZED"></span>
+    <span class="country" data-final="🪟 COPILOT — SYSTEM ASSIST MODE ENABLED"></span>
+    <span class="country" data-final="🔷 MICROSOFT AI — CLOUD CIRCUITS ACTIVE"></span>
+    <span class="country" data-final="🌪 MISTRAL — INFERENCE CURRENT FLOWING"></span>
+    <span class="country" data-final="🦙 LLAMA — OPEN WEIGHTS LINKED"></span>
+    <span class="country" data-final="♾ META AI — NETWORK BRIDGE ACTIVE"></span>
+    <span class="country" data-final="🔍 PERPLEXITY — SEARCH NODE STABLE"></span>
+    <span class="country" data-final="🖼 STABILITY AI — IMAGE CORE ONLINE"></span>
+    <span class="country" data-final="🎨 MIDJOURNEY — CREATIVE CHANNEL ACTIVE"></span>
+    <span class="country" data-final="🌐 GLOBAL AI NODE — DATA SECURED"></span>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById('matrixCanvas');
+const ctx = canvas.getContext('2d');
+const alertWave = document.getElementById('alertWave');
+const alertFlash = document.getElementById('alertFlash');
+const marqueeContainer = document.getElementById('marqueeContainer');
+const countryEls = document.querySelectorAll('.country');
+
+const chars = "アァイィウヴエカキクケコサシスセソタチツテトナニヌネノ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ#$%&@";
+const scramblePool = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*+-/<>アカサタナマラ";
+const glitchWords = ["ALERT", "BREACH", "ACCESS", "OVERRIDE", "INTRUSION", "NEURAL", "PROMPT", "TOKEN"];
+
+const fontSize = 16;
+let columns = 0;
+let drops = [];
+let overlays = [];
+let pulses = [];
+let learningLevel = 0;
+let repeatedWord = null;
+let repeatedWordTimer = 0;
+let nodes = [];
+let chainLinks = [];
+
+function resizeCanvas() {
+  canvas.width = innerWidth;
+  canvas.height = innerHeight;
+  columns = Math.floor(canvas.width / fontSize);
+  drops = Array.from({ length: columns }, () => Math.floor(Math.random() * (canvas.height / fontSize)));
+  buildAIWorld();
+}
+resizeCanvas();
+addEventListener('resize', resizeCanvas);
+
+function aiNode(x, y, label, weight = 1) {
+  return {
+    x: canvas.width * x,
+    y: canvas.height * y,
+    label,
+    weight,
+    phase: Math.random() * Math.PI * 2
+  };
+}
+
+function buildAIWorld() {
+  nodes = [
+    aiNode(0.18, 0.42, "OPENAI", 1.8),
+    aiNode(0.23, 0.43, "CHATGPT", 1.8),
+    aiNode(0.28, 0.44, "GPT-4", 1.6),
+    aiNode(0.33, 0.45, "GPT-5", 1.7),
+
+    aiNode(0.47, 0.36, "CLAUDE", 1.4),
+    aiNode(0.52, 0.38, "ANTHROPIC", 1.3),
+    aiNode(0.58, 0.36, "MISTRAL", 1.2),
+
+    aiNode(0.62, 0.43, "GEMINI", 1.5),
+    aiNode(0.68, 0.45, "GOOGLE AI", 1.4),
+    aiNode(0.73, 0.48, "COPILOT", 1.3),
+    aiNode(0.79, 0.51, "MICROSOFT AI", 1.4),
+
+    aiNode(0.74, 0.62, "LLAMA", 1.2),
+    aiNode(0.69, 0.67, "META AI", 1.2),
+    aiNode(0.56, 0.60, "PERPLEXITY", 1.1),
+
+    aiNode(0.83, 0.32, "STABILITY AI", 1.1),
+    aiNode(0.88, 0.38, "MIDJOURNEY", 1.1),
+
+    aiNode(0.50, 0.78, "GLOBAL AI NODE", 1.5)
+  ];
+
+  chainLinks = [
+    [0,1],[1,2],[2,3],
+    [3,4],[4,5],[5,6],
+    [6,7],[7,8],[8,9],[9,10],
+    [8,11],[11,12],[12,13],
+    [8,14],[14,15],
+    [13,16],[10,16],[3,16]
+  ];
+}
+
+function randomChar() {
+  return chars[Math.floor(Math.random() * chars.length)];
+}
+
+function spawnOverlayWord() {
+  const pool = [
+    "OPENAI","CHATGPT","GPT-4","GPT-5","CLAUDE","ANTHROPIC","GEMINI",
+    "GOOGLE AI","COPILOT","MICROSOFT AI","MISTRAL","LLAMA","META AI",
+    "PERPLEXITY","STABILITY AI","MIDJOURNEY","GLOBAL AI NODE",
+    "PROMPT","TOKEN","NEURAL","BREACH","ALERT","ACCESS"
+  ];
+
+  const chosen = repeatedWord && Math.random() < learningLevel * 0.7
+    ? repeatedWord
+    : pool[Math.floor(Math.random() * pool.length)];
+
+  overlays.push({
+    text: chosen,
+    x: Math.random() * Math.max(80, canvas.width - chosen.length * 14),
+    y: Math.random() * Math.max(120, canvas.height - 60),
+    life: 0,
+    maxLife: 70 + Math.floor(Math.random() * 45)
+  });
+}
+
+function spawnPulse() {
+  if (Math.random() < 0.08 && chainLinks.length) {
+    const [a, b] = chainLinks[Math.floor(Math.random() * chainLinks.length)];
+    pulses.push({
+      a, b, t: 0,
+      speed: 0.018 + Math.random() * 0.022
+    });
+  }
+}
+
+function drawAIGlowBands() {
+  ctx.save();
+  ctx.fillStyle = "rgba(80,140,255,0.06)";
+  ctx.beginPath();
+  ctx.ellipse(canvas.width * 0.28, canvas.height * 0.44, canvas.width * 0.17, canvas.height * 0.08, 0.04, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "rgba(120,210,255,0.05)";
+  ctx.beginPath();
+  ctx.ellipse(canvas.width * 0.72, canvas.height * 0.48, canvas.width * 0.18, canvas.height * 0.09, 0.08, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "rgba(180,120,255,0.04)";
+  ctx.beginPath();
+  ctx.ellipse(canvas.width * 0.58, canvas.height * 0.67, canvas.width * 0.16, canvas.height * 0.07, -0.12, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawAIArc() {
+  const t = Date.now() * 0.002;
+  const alpha = 0.08 + 0.05 * (1 + Math.sin(t));
+
+  ctx.save();
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = `rgba(120,220,255,${alpha})`;
+  ctx.shadowColor = 'rgba(120,220,255,0.45)';
+  ctx.shadowBlur = 14;
+
+  ctx.beginPath();
+  ctx.moveTo(canvas.width * 0.28, canvas.height * 0.43);
+  ctx.quadraticCurveTo(canvas.width * 0.56, canvas.height * 0.18, canvas.width * 0.88, canvas.height * 0.38);
+  ctx.stroke();
+
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = `rgba(255,255,255,${alpha * 0.75})`;
+  ctx.beginPath();
+  ctx.moveTo(canvas.width * 0.31, canvas.height * 0.45);
+  ctx.quadraticCurveTo(canvas.width * 0.57, canvas.height * 0.23, canvas.width * 0.85, canvas.height * 0.41);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawNetwork() {
+  const t = Date.now() * 0.0018;
+  ctx.save();
+  ctx.lineCap = 'round';
+
+  chainLinks.forEach(([ai, bi], idx) => {
+    const a = nodes[ai], b = nodes[bi];
+    if (!a || !b) return;
+
+    const pulse = 0.14 + 0.14 * (1 + Math.sin(t * 2 + idx));
+    const glow = 0.04 + 0.03 * (1 + Math.sin(t * 3 + idx * 0.7));
+
+    ctx.strokeStyle = `rgba(120,220,255,${pulse})`;
+    ctx.shadowColor = `rgba(120,220,255,${glow})`;
+    ctx.shadowBlur = 10;
+    ctx.lineWidth = 1.1;
+
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
+    ctx.stroke();
+  });
+
+  for (let i = pulses.length - 1; i >= 0; i--) {
+    const p = pulses[i];
+    const a = nodes[p.a], b = nodes[p.b];
+    if (!a || !b) {
+      pulses.splice(i, 1);
+      continue;
+    }
+
+    p.t += p.speed;
+    const x = a.x + (b.x - a.x) * p.t;
+    const y = a.y + (b.y - a.y) * p.t;
+
+    ctx.shadowBlur = 16;
+    ctx.shadowColor = 'rgba(255,255,255,0.9)';
+    ctx.fillStyle = 'rgba(255,255,255,0.95)';
+    ctx.beginPath();
+    ctx.arc(x, y, 2.2, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.shadowBlur = 28;
+    ctx.fillStyle = 'rgba(120,220,255,0.42)';
+    ctx.beginPath();
+    ctx.arc(x, y, 5, 0, Math.PI * 2);
+    ctx.fill();
+
+    if (p.t >= 1) pulses.splice(i, 1);
+  }
+
+  ctx.restore();
+}
+
+function drawNodes() {
+  nodes.forEach(n => {
+    const alpha = 0.18 + Math.abs(Math.sin(Date.now() * 0.002 + n.phase)) * 0.22 * n.weight;
+
+    ctx.fillStyle = `rgba(120,220,255,${alpha})`;
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, 2.2 * n.weight, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = `rgba(255,255,255,${alpha * 0.30})`;
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, 4.8 * n.weight, 0, Math.PI * 2);
+    ctx.fill();
+  });
+}
+
+function drawMatrix() {
+  ctx.fillStyle = 'rgba(0,0,0,0.08)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  drawAIGlowBands();
+  drawAIArc();
+  drawNetwork();
+  drawNodes();
+
+  ctx.font = fontSize + 'px monospace';
+
+  for (let i = 0; i < drops.length; i++) {
+    const isHack = Math.random() < (0.02 + learningLevel * 0.05);
+    const text = randomChar();
+
+    if (isHack) {
+      ctx.fillStyle = Math.random() < 0.7 ? '#ff2a2a' : '#ffffff';
+      ctx.shadowColor = '#ff2a2a';
+    } else {
+      ctx.fillStyle = '#00ff66';
+      ctx.shadowColor = '#00ff66';
+    }
+
+    ctx.shadowBlur = 8;
+    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+    if (Math.random() < 0.003 + learningLevel * 0.008) {
+      ctx.fillStyle = Math.random() < 0.5 ? '#ffffff' : '#ff2a2a';
+      ctx.fillText('!', i * fontSize, drops[i] * fontSize);
+    }
+
+    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+    drops[i]++;
+  }
+
+  ctx.shadowBlur = 0;
+
+  for (let i = overlays.length - 1; i >= 0; i--) {
+    const o = overlays[i];
+    o.life++;
+    const alpha = Math.max(0, 1 - o.life / o.maxLife);
+    const isGlitchWord = glitchWords.includes(o.text);
+
+    ctx.fillStyle = isGlitchWord
+      ? `rgba(255,60,60,${alpha * 0.26})`
+      : `rgba(255,40,40,${alpha * 0.12})`;
+    ctx.font = 'bold 26px monospace';
+    ctx.fillText(o.text, o.x + 2, o.y);
+
+    ctx.fillStyle = isGlitchWord
+      ? `rgba(255,80,80,${alpha * 0.95})`
+      : `rgba(0,255,102,${alpha * 0.92})`;
+    ctx.shadowColor = isGlitchWord ? '#ff4d4d' : '#00ff66';
+    ctx.shadowBlur = 12;
+    ctx.fillText(o.text, o.x, o.y);
+    ctx.shadowBlur = 0;
+
+    if (o.life >= o.maxLife) overlays.splice(i, 1);
+  }
+}
+
+function scrambleToText(el, finalText, duration = 1400) {
+  let frame = 0;
+  const totalFrames = Math.max(20, Math.floor(duration / 40));
+
+  const interval = setInterval(() => {
+    let output = '';
+    for (let i = 0; i < finalText.length; i++) {
+      if (finalText[i] === ' ') {
+        output += ' ';
+        continue;
+      }
+
+      const progress = frame / totalFrames;
+      const revealIndex = Math.floor(progress * finalText.length);
+
+      output += i < revealIndex
+        ? finalText[i]
+        : scramblePool[Math.floor(Math.random() * scramblePool.length)];
+    }
+
+    el.textContent = output;
+    frame++;
+
+    if (frame > totalFrames) {
+      clearInterval(interval);
+      el.textContent = finalText;
+    }
+  }, 40);
+}
+
+function initDecrypt() {
+  countryEls.forEach((el, idx) => {
+    setTimeout(() => scrambleToText(el, el.dataset.final, 1200 + Math.random() * 700), idx * 90);
+  });
+}
+
+function triggerGlobalBreach() {
+  countryEls.forEach(el => el.classList.add('global-breach'));
+  setTimeout(() => countryEls.forEach(el => el.classList.remove('global-breach')), 1000);
+}
+
+function triggerChainReaction(originIndex) {
+  const neighbors = [
+    countryEls[originIndex - 2],
+    countryEls[originIndex - 1],
+    countryEls[originIndex + 1],
+    countryEls[originIndex + 2]
+  ].filter(Boolean);
+
+  neighbors.forEach((node, idx) => {
+    setTimeout(() => {
+      node.classList.add('chain-react');
+      setTimeout(() => node.classList.remove('chain-react'), 420);
+    }, idx * 80);
+  });
+}
+
+function triggerBreachWave() {
+  marqueeContainer.classList.add('breach-mode');
+  alertWave.classList.remove('active');
+  void alertWave.offsetWidth;
+  alertWave.classList.add('active');
+  triggerGlobalBreach();
+  setTimeout(() => marqueeContainer.classList.remove('breach-mode'), 950);
+}
+
+function triggerAlertFlash() {
+  alertFlash.classList.remove('active');
+  void alertFlash.offsetWidth;
+  alertFlash.classList.add('active');
+}
+
+function intensifyLearning(triggerWord) {
+  learningLevel = Math.min(1, learningLevel + 0.12);
+
+  if (["BREACH", "ALERT", "ACCESS", "TOKEN", "PROMPT"].includes(triggerWord)) {
+    repeatedWord = triggerWord;
+    repeatedWordTimer = 8 + Math.floor(Math.random() * 6);
+    learningLevel = Math.min(1, learningLevel + 0.12);
+  }
+}
+
+initDecrypt();
+
+function loop() {
+  drawMatrix();
+  spawnPulse();
+  requestAnimationFrame(loop);
+}
+loop();
+
+setInterval(() => {
+  const spawnChance = 0.88 + learningLevel * 0.08;
+  if (Math.random() < spawnChance) spawnOverlayWord();
+
+  if (repeatedWordTimer > 0) repeatedWordTimer--;
+  else repeatedWord = null;
+
+  learningLevel *= 0.992;
+}, 1800);
+
+setInterval(() => {
+  const originIndex = Math.floor(Math.random() * countryEls.length);
+  const el = countryEls[originIndex];
+  if (!el) return;
+
+  el.classList.add('glitch');
+  const original = el.dataset.final;
+  let chosenTrigger = null;
+  let count = 0;
+
+  const g = setInterval(() => {
+    const triggerWord = glitchWords[Math.floor(Math.random() * glitchWords.length)];
+    if (!chosenTrigger && Math.random() < 0.55) chosenTrigger = triggerWord;
+
+    const hacked = original.split('').map(ch => {
+      if (ch === ' ' || Math.random() > (0.18 + learningLevel * 0.12)) return ch;
+      if (Math.random() < (0.25 + learningLevel * 0.18)) {
+        const word = chosenTrigger || triggerWord;
+        return word[Math.floor(Math.random() * word.length)];
+      }
+      return scramblePool[Math.floor(Math.random() * scramblePool.length)];
+    }).join('');
+
+    el.textContent = hacked;
+    count++;
+
+    if (count === 1 && chosenTrigger) triggerChainReaction(originIndex);
+
+    if (chosenTrigger === "BREACH" && count === 1) {
+      triggerBreachWave();
+      intensifyLearning("BREACH");
+    }
+
+    if (chosenTrigger === "ALERT" && count === 1) {
+      triggerAlertFlash();
+      intensifyLearning("ALERT");
+    }
+
+    if (chosenTrigger === "ACCESS" && count === 1) {
+      intensifyLearning("ACCESS");
+    }
+
+    if (chosenTrigger === "PROMPT" && count === 1) {
+      triggerAlertFlash();
+      intensifyLearning("PROMPT");
+    }
+
+    if (chosenTrigger === "TOKEN" && count === 1) {
+      intensifyLearning("TOKEN");
+    }
+
+    if (count > 3) {
+      clearInterval(g);
+      el.textContent = original;
+      el.classList.remove('glitch');
+    }
+  }, 70);
+}, 2500);
+</script>
+</body>
+</html>

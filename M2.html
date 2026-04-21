@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { margin: 0; background: #000; overflow: hidden; font-family: 'Courier New', monospace; }
+  
+  #matrixCanvas { position: fixed; inset: 0; z-index: 0; background: #000; }
+  
+  .marquee-container {
+    position: relative; z-index: 3; margin-top: 50px;
+    background: rgba(0, 10, 0, 0.9); color: #00ff66; padding: 15px 0;
+    border-top: 1px solid #0f0; border-bottom: 1px solid #0f0;
+    overflow: hidden; white-space: nowrap;
+    box-shadow: 0 0 25px rgba(0, 255, 0, 0.2);
+  }
+
+  .marquee-content { 
+    display: inline-flex; 
+    animation: marquee-run 160s linear infinite; 
+  }
+
+  @keyframes marquee-run { 
+    0% { transform: translateX(0); } 
+    100% { transform: translateX(-50%); } 
+  }
+
+  .node { 
+    display: inline-block; 
+    padding-right: 120px; 
+    font-weight: bold; 
+    font-size: 18px; 
+    letter-spacing: 1px;
+    min-width: 400px; /* Фиксируем ширину, чтобы строка не дергалась */
+  }
+
+  .euro { color: #66ccff; text-shadow: 0 0 8px #66ccff; }
+  .amer { color: #ffd24d; text-shadow: 0 0 8px #ffd24d; }
+  .asia { color: #ff66cc; text-shadow: 0 0 8px #ff66cc; }
+  .safe { color: #00ff66; text-shadow: 0 0 8px #00ff66; }
+  .alert { color: #ff4d4d; text-shadow: 0 0 8px #ff4d4d; }
+</style>
+</head>
+<body>
+
+<canvas id="matrixCanvas"></canvas>
+
+<div class="marquee-container">
+  <div class="marquee-content" id="marquee">
+    <span class="node euro" data-final="🇬🇧 UNITED KINGDOM: NODE ACTIVE"></span>
+    <span class="node euro" data-final="🇩🇪 GERMANY: DATA SYNC"></span>
+    <span class="node euro" data-final="🇫🇷 FRANCE: STABLE"></span>
+    <span class="node euro" data-final="🇧🇪 BELGIUM: HUB CONNECTED"></span>
+    <span class="node euro" data-final="🇮🇹 ITALY: IO & GEMINI HQ"></span>
+    <span class="node amer" data-final="🇺🇸 USA EAST/WEST: TRAFFIC HIGH"></span>
+    <span class="node amer" data-final="🇨🇦 CANADA: OPERATIONAL"></span>
+    <span class="node amer" data-final="🇧🇷 BRAZIL: NODE DETECTED"></span>
+    <span class="node asia" data-final="🇯🇵 JAPAN: SYSTEM ONLINE"></span>
+    <span class="node asia" data-final="🇮🇳 INDIA: PROCESSING DATA"></span>
+    <span class="node asia" data-final="🇦🇪 UAE: STABLE CONNECTION"></span>
+    <span class="node asia" data-final="🇦🇺 AUSTRALIA: LINKED"></span>
+    <span class="node safe" data-final="🇿🇦 SOUTH AFRICA: ACTIVE"></span>
+    <span class="node alert" data-final="⚠️ CHECHNYA NODE: REGIONAL SIGNAL"></span>
+    <span class="node alert" data-final="🇷🇺 RUSSIA: ENCRYPTED MODE"></span>
+    <span class="node alert" data-final="🇺🇦 UKRAINE: SYSTEM ACTIVE"></span>
+    <span class="node alert" data-final="🇵🇸 PALESTINE: SECURED"></span>
+    <span class="node alert" data-final="🇦🇫 AFGHANISTAN: LINKED"></span>
+    <span class="node euro" data-final="🇬🇧 UNITED KINGDOM: NODE ACTIVE"></span>
+    <span class="node euro" data-final="🇩🇪 GERMANY: DATA SYNC"></span>
+    <span class="node euro" data-final="🇫🇷 FRANCE: STABLE"></span>
+    <span class="node euro" data-final="🇧🇪 BELGIUM: HUB CONNECTED"></span>
+    <span class="node euro" data-final="🇮🇹 ITALY: IO & GEMINI HQ"></span>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById('matrixCanvas');
+const ctx = canvas.getContext('2d');
+const chars = "アァイィウヴエカキクケコサシスセソ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ#%&*";
+const fontSize = 16;
+let drops = [];
+
+function initMatrix() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const columns = Math.floor(canvas.width / fontSize);
+  drops = Array.from({ length: columns }, () => Math.random() * canvas.height / fontSize);
+}
+
+function drawMatrix() {
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#0f0';
+  ctx.font = fontSize + 'px monospace';
+  for (let i = 0; i < drops.length; i++) {
+    const text = chars[Math.floor(Math.random() * chars.length)];
+    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+    drops[i]++;
+  }
+}
+
+// ФУНКЦИЯ ПОСТОЯННОЙ ДЕШИФРОВКИ
+function startContinuousScramble(el) {
+  const finalText = el.getAttribute('data-final');
+  let iteration = 0;
+  let interval = null;
+
+  const run = () => {
+    iteration = 0;
+    clearInterval(interval);
+    
+    interval = setInterval(() => {
+      el.innerText = finalText
+        .split("")
+        .map((letter, i) => {
+          if (i < iteration) return finalText[i];
+          return chars[Math.floor(Math.random() * chars.length)];
+        })
+        .join("");
+      
+      if (iteration >= finalText.length) {
+        clearInterval(interval);
+        // Ждем 5 секунд и запускаем заново
+        setTimeout(run, 5000 + Math.random() * 3000);
+      }
+      
+      iteration += 1/2; 
+    }, 40);
+  };
+
+  run();
+}
+
+window.addEventListener('resize', initMatrix);
+initMatrix();
+setInterval(drawMatrix, 35);
+
+window.onload = () => {
+  const nodes = document.querySelectorAll('.node');
+  nodes.forEach((el, index) => {
+    // Запускаем каждый узел с небольшой задержкой, чтобы они не дешифровались одновременно
+    setTimeout(() => startContinuousScramble(el), index * 300);
+  });
+};
+</script>
+</body>
+</html>

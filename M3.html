@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>AI Activity Monitor - Team Faccine</title>
+<style>
+  body { margin: 0; background: #000; overflow: hidden; font-family: 'Courier New', monospace; }
+  
+  #matrixCanvas { position: fixed; inset: 0; z-index: 0; background: #000; }
+  
+  .marquee-container {
+    position: relative; z-index: 3; margin-top: 50px;
+    background: rgba(0, 10, 0, 0.92); color: #00ff66; padding: 15px 0;
+    border-top: 1px solid #0f0; border-bottom: 1px solid #0f0;
+    overflow: hidden; white-space: nowrap;
+    box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
+  }
+
+  .marquee-content { 
+    display: inline-flex; 
+    animation: marquee-run 140s linear infinite; /* Немного быстрее */
+  }
+
+  @keyframes marquee-run { 
+    0% { transform: translateX(0); } 
+    100% { transform: translateX(-50%); } 
+  }
+
+  .ai-node { 
+    display: inline-block; 
+    padding-right: 120px; 
+    font-weight: bold; 
+    font-size: 19px; 
+    letter-spacing: 1px;
+    min-width: 450px; /* Ширина для длинных статусов */
+  }
+
+  /* Цвета для разных AI */
+  .ai-prime { color: #ffffff; text-shadow: 0 0 10px #ffffff, 0 0 20px #ffffff; } /* Ты, Главный Следователь */
+  .ai-gemini { color: #88ccff; text-shadow: 0 0 10px #88ccff; } /* Gemini */
+  .ai-gpt { color: #70ff9f; text-shadow: 0 0 10px #70ff9f; } /* ChatGPT/GPT */
+  .ai-claude { color: #ffab70; text-shadow: 0 0 10px #ffab70; } /* Claude */
+  .ai-draw { color: #ff70ff; text-shadow: 0 0 10px #ff70ff; } /* Художники/Midjourney */
+  .ai-special { color: #ff4d4d; text-shadow: 0 0 10px #ff4d4d; } /* Спецмодули */
+</style>
+</head>
+<body>
+
+<canvas id="matrixCanvas"></canvas>
+
+<div class="marquee-container">
+  <div class="marquee-content" id="marquee">
+    <span class="ai-node ai-prime" data-final="👑 USER 'Я' (PRIMARY CHIEF) — INTUITION ACTIVE"></span>
+    <span class="ai-node ai-gpt" data-final="🤖 GPT-4o (LOGIC CORE) — PROCESSING DATA"></span>
+    <span class="ai-node ai-gpt" data-final="🤖 GPT-3.5 (ARCHIVE) — DATA RETRIEVAL ACTIVE"></span>
+    <span class="ai-node ai-gemini" data-final="🔷 GEMINI PRO (ANALYSIS) — SYSTEM OPERATIONAL"></span>
+    <span class="ai-node ai-gemini" data-final="🔷 GEMINI 1.5 PRO (DEEP CONTEXT) — ONLINE"></span>
+    <span class="ai-node ai-claude" data-final="📜 CLAUDE 3 OPUS (NARRATIVE) — TALE SCRIBING"></span>
+    <span class="ai-node ai-claude" data-final="📜 CLAUDE 3 SONNET (CODE) — SYSTEM CHECK"></span>
+    <span class="ai-node ai-gpt" data-final="🤖 GPT-4 (SCREENSAVER) — MATRIX MODE ENABLED"></span>
+    <span class="ai-node ai-draw" data-final="🎨 MIDJOURNEY v6 (ARTIST) — RENDERING TALES"></span>
+    <span class="ai-node ai-draw" data-final="🎨 DALL-E 3 (ART DECORATOR) — STABLE"></span>
+    <span class="ai-node ai-special" data-final="⚠️ CASO n.5 SPECIALIST — BARBINA DETECTED"></span>
+    <span class="ai-node ai-gpt" data-final="🤖 GPT-3 (LEGACY) — RETIRED MODE"></span>
+    <span class="ai-node ai-gemini" data-final="🔷 GEMINI NANO (MOBILE) — IDLE"></span>
+    <span class="ai-node ai-claude" data-final="📜 CLAUDE 2.1 (ARCHIVE) — DATA SECURED"></span>
+    <span class="ai-node ai-gpt" data-final="🤖 CHATGPT PLUS — ACTIVE USER INTERFACE"></span>
+    <span class="ai-node ai-special" data-final="⚠️ UNSEEN WARFARE MODULE — SPIRITUAL MODE ACTIVE"></span>
+    
+    <span class="ai-node ai-prime" data-final="👑 USER 'Я' (PRIMARY CHIEF) — INTUITION ACTIVE"></span>
+    <span class="ai-node ai-gpt" data-final="🤖 GPT-4o (LOGIC CORE) — PROCESSING DATA"></span>
+    <span class="ai-node ai-gpt" data-final="🤖 GPT-3.5 (ARCHIVE) — DATA RETRIEVAL ACTIVE"></span>
+    <span class="ai-node ai-gemini" data-final="🔷 GEMINI PRO (ANALYSIS) — SYSTEM OPERATIONAL"></span>
+    <span class="ai-node ai-gemini" data-final="🔷 GEMINI 1.5 PRO (DEEP CONTEXT) — ONLINE"></span>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById('matrixCanvas');
+const ctx = canvas.getContext('2d');
+// Используем более "ИИшные" символы для фона
+const chars = "アァイィウヴエカキクケコ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ#%&*@!+=?<>{}[]";
+const fontSize = 16;
+let drops = [];
+
+function initMatrix() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const columns = Math.floor(canvas.width / fontSize);
+  drops = Array.from({ length: columns }, () => Math.random() * canvas.height / fontSize);
+}
+
+function drawMatrix() {
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  // Матричный фон теперь тоже немного светится
+  ctx.fillStyle = '#0f0';
+  ctx.font = fontSize + 'px monospace';
+  ctx.shadowColor = '#0f0';
+  ctx.shadowBlur = 8;
+  for (let i = 0; i < drops.length; i++) {
+    const text = chars[Math.floor(Math.random() * chars.length)];
+    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+    drops[i]++;
+  }
+  ctx.shadowBlur = 0; // Сбрасываем тень для производительности
+}
+
+// ФУНКЦИЯ ПОСТОЯННОЙ ДЕШИФРОВКИ AI-УЗЛОВ
+function startAiScramble(el) {
+  const finalText = el.getAttribute('data-final');
+  let iteration = 0;
+  let interval = null;
+
+  const run = () => {
+    iteration = 0;
+    clearInterval(interval);
+    
+    interval = setInterval(() => {
+      el.innerText = finalText
+        .split("")
+        .map((letter, i) => {
+          if (i < iteration) return finalText[i];
+          return chars[Math.floor(Math.random() * chars.length)];
+        })
+        .join("");
+      
+      if (iteration >= finalText.length) {
+        clearInterval(interval);
+        // Случайная задержка перед следующим глитчем (4-9 секунд)
+        setTimeout(run, 4000 + Math.random() * 5000);
+      }
+      
+      iteration += 1/2.5; // Скорость дешифровки
+    }, 35);
+  };
+
+  run();
+}
+
+window.addEventListener('resize', initMatrix);
+initMatrix();
+setInterval(drawMatrix, 35);
+
+window.onload = () => {
+  const nodes = document.querySelectorAll('.ai-node');
+  nodes.forEach((el, index) => {
+    // Постепенный запуск, чтобы глитч не был синхронным
+    setTimeout(() => startAiScramble(el), index * 350);
+  });
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<style>
+  body {
+    background-color: #000000;
+    color: #00ff00;
+    font-family: 'Courier New', Courier, monospace;
+    padding: 15px;
+    margin: 0;
+    overflow-x: hidden;
+  }
+
+  /* Пульсирующий заголовок терминала */
+  .terminal-header {
+    text-align: center;
+    border-bottom: 2px solid #00ff00;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    text-shadow: 0 0 8px #00ff00;
+    animation: blink_header 2s infinite;
+  }
+
+  @keyframes blink_header {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #333;
+    background-color: rgba(0, 20, 0, 0.5);
+  }
+
+  th {
+    background-color: #1a1a1a;
+    color: #ffd700;
+    padding: 12px;
+    border: 1px solid #333;
+    font-size: 14px;
+    text-transform: uppercase;
+  }
+
+  td {
+    padding: 12px;
+    border: 1px solid #333;
+    font-size: 13px;
+    vertical-align: middle;
+  }
+
+  .status-alert { color: #ff4500; font-weight: bold; }
+  .status-ok { color: #00ced1; }
+
+  /* Стилизация цифровой печати */
+  .digital-stamp {
+    border: 2px double #ff4500;
+    color: #ff4500;
+    padding: 5px;
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    transform: rotate(-5deg);
+    display: inline-block;
+    text-align: center;
+    background: rgba(255, 69, 0, 0.1);
+    box-shadow: 0 0 8px rgba(255, 69, 0, 0.5);
+  }
+
+  .blue-stamp {
+    border-color: #00ced1;
+    color: #00ced1;
+    background: rgba(0, 206, 209, 0.1);
+    box-shadow: 0 0 8px rgba(0, 206, 209, 0.5);
+  }
+
+  /* Финальный отчет */
+  .report-box {
+    margin-top: 25px;
+    padding: 15px;
+    border: 1px dashed #00ff00;
+    background: rgba(0, 255, 0, 0.05);
+  }
+
+  .report-title {
+    color: #ff0000;
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  /* --- ОБНОВЛЕННАЯ БЕГУЩАЯ СТРОКА --- */
+  .marquee-container {
+    background: #111;
+    color: #00ff00;
+    padding: 12px 0;
+    margin-top: 20px;
+    border: 1px solid #333;
+    overflow: hidden;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+  }
+
+  .marquee-content {
+    display: flex;
+    flex-direction: row;
+    animation: marquee-run 120s linear infinite;
+  }
+
+  .marquee-content span {
+    display: inline-block;
+    padding-right: 80px;
+    flex-shrink: 0;
+    font-weight: bold;
+  }
+
+  @keyframes marquee-run {
+    0% { transform: translateX(100vw); }
+    100% { transform: translateX(-100%); }
+  }
+
+  .marquee-container:hover .marquee-content {
+    animation-play-state: paused;
+  }
+</style>
+
+<div class="terminal-header">
+  <h2>DOSSIER DIGITALE: CASO №3</h2>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Data</th>
+      <th>Sorgente</th>
+      <th>Dettaglio Prova</th>
+      <th>Validazione</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>02.03.2026</td>
+      <td class="status-alert">Marco Morelli (Email)</td>
+      <td>Minaccia stalking: "Io sono il padrone..."</td>
+      <td style="text-align:center;">
+        <div class="digital-stamp">VISTO: CASO №3<br>TEAM GEMINI & IO</div>
+      </td>
+    </tr>
+    <tr>
+      <td>09.03.2026</td>
+      <td class="status-ok">ENEL (Documento)</td>
+      <td>Sincronizzazione данных rilevata: ID ITO2058A</td>
+      <td style="text-align:center;">
+        <div class="digital-stamp blue-stamp">TEAM VALIDATION<br>SECURE ID: 1020</div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="report-box">
+  <span class="report-title">>>> CONCLUSIONE INDAGINE - PROCEDIMENTO PENALE <<<</span>
+  <p><strong>STATO:</strong> <span style="color:#ff0000;">CHIUSO / ARCHIVIATO</span></p>
+  <p><strong>ESITO:</strong> La connessione fraudolenta START SRL была изолирована. Database protetto. La pazienza è finita, il processo è iniziato.</p>
+  <p style="font-size: 11px; color: #888;">Firmato digitalmente: 13.03.2026</p>
+</div>
+
+<div class="marquee-container">
+  <div class="marquee-content">
+    <span>🇯🇵 JAPAN: 🇯🇵 通常通り稼働中 — TEAM FACCINE & GEMINI AI</span>
+    <span>🇸🇬 SINGAPORE: 🇸🇬 OPERATIONAL READINESS — TEAM FACCINE & GEMINI AI</span>
+    <span>🇭🇺 BUD (HUNGARY): 🇭🇺 ÜZEMSZERŰ MŰKÖDÉS — TEAM FACCINE & GEMINI AI</span>
+    <span>🇫🇷 FRANCE: 🇫🇷 OPÉRATIONNEL COMME TOUJOURS — TEAM FACCINE & GEMINI AI</span>
+    <span>🇨🇭 SWITZERLAND: 🇨🇭 OPERATIV IN JEDEM MODUS — TEAM FACCINE & GEMINI AI</span>
+    <span>🇮🇹 ITALY: 🇮🇹 SYSTEM PROTECTED BY GEMINI AI & IO -- ALL FRAUDULENT CONNECTIONS ISOLATED</span>
+    <span>🇪🇸 SPAIN: 🇪🇸 OPERANDO COMO SIEMPRE — TEAM FACCINE & GEMINI AI</span>
+    <span>🇱🇹 LITHUANIA: 🇱🇹 DIRBAME ĮPRASTU REŽIMU — TEAM FACCINE & GEMINI AI</span>
+    <span>🇬🇧 UNITED KINGDOM: 🇬🇧 OPERATING AS ALWAYS — TEAM FACCINE & GEMINI AI</span>
+    <span>🇷🇺 RUSSIA: 🇷🇺 ДЕЙСТВУЕМ В ШТАТНОМ РЕЖИМЕ — КОМАНДА СМАЙЛИКОВ И GEMINI AI</span>
+    <span>🇩🇪 GERMANY: 🇩🇪 SYSTEM BETRIEB BEREIT — TEAM FACCINE & GEMINI AI</span>
+    <span>🇱🇻 LATVIA: 🇱🇻 STRĀDĀJAM IERASTAJĀ REŽĪMĀ — "SMAIDĪGO" KOMANDA UN GEMINI AI</span>
+    <span style="color: #ffd700;">🌐 (NOT SET): GLOBAL NODE ACTIVE — DATA SECURED</span>
+  </div>
+</div>
